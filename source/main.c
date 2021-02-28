@@ -86,7 +86,7 @@ int main(void) {
 			tasks[i]->elapsedTime += 1;
 		}
 		while(!TimerFlag);
-		TimerFlag = 0
+		TimerFlag = 0;
     }
     return 1;
 }
