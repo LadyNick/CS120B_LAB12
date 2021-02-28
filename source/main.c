@@ -61,9 +61,32 @@ int main(void) {
     DDRC = 0xFF; PORTC = 0x00;
     DDRD = 0xFF; PORTD = 0x00;
 
-    /* Insert your solution below */
-    while (1) {
+    static task task1;
+    task *tasks[] = {&task1};
+    const unsigned short numTasks = sizeof(tasks)/sizeof(task*);
 
+    const char start = -1;
+
+    //Prelab
+    task1.state = start;
+    task1.period = 100; 
+    task1.elapsedTime = task1.period;
+    task1.TickFct = &Demo_Tick;
+
+    TimerSet(1);
+    TimerOn();
+    unsigned short i;
+
+    while (1) {
+	    for(i=0; i<numTasks; i++){ //Scheduler code
+			if(tasks[i]->elapsedTime == tasks[i]->period){
+				tasks[i]->state = tasks[i]->TickFct(tasks[i]->state);
+				tasks[i]->elapsedTime = 0;
+			}
+			tasks[i]->elapsedTime += 1;
+		}
+		while(!TimerFlag);
+		TimerFlag = 0
     }
     return 1;
 }
