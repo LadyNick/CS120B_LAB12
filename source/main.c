@@ -16,107 +16,116 @@
 #include "scheduler.h"
 #endif
 
-char pattern_ [5] = {0, 0x3C, 0x24, 0x3C, 0};
-char row_ [5] = { 0xFE, 0xFD, 0xFB, 0xF7, 0xEF}; 
+char pattern[5] = {0x00, 0x3C, 0x24, 0x3C, 0x00};
+char row[5] = { 0xFE, 0xFD, 0xFB, 0xF7, 0xEF}; 
 unsigned char update = 0;
+bool edge = false;
 
-//unsigned char pattern = 0x80;
-//unsigned char row = 0xE0;
-unsigned char A1;
+
 unsigned char A0;
+unsigned char A1;
 unsigned char A2;
 unsigned char A3;
 
-enum Row_States {rowwait, rowup,rowdown, rowrelease}Row_State;
-int Row_Tick(int Row_State) {
+enum Move_States {wait, up, down, left, right, release}Move_State;
+int Move_Tick(int Move_State) {
 	
-	// Transitions
-/*	switch (Row_State) {
-		case rowwait:
+	switch (Move_State) {
+		case wait:
 			if(A0){
-				Row_State = rowup;
+				Move_State = up;
 			}
 			else if(A1){
-				Row_State = rowdown;
+				Move_State = down;
 			}
-			else{
-				Row_State = rowwait;
-			}
-			break;
-		case rowdown:
-			if(row == 0xEF){
-				//do nothing, keep it the same
-			}
-			else{
-				row = (row << 1) | 0x01;
-			}
-			Row_State = rowrelease;
-			break;
-		case rowup:
-			if(row == 0xFE){
-				//do nothing, keep it the same
-			}
-			else{
-				row = (row >> 1) | 0x80;
-			}
-			Row_State = rowrelease;
-			break;
-		case rowrelease:
-			if(!A0 && !A1){
-				Row_State = rowwait;
-			}
-			else{
-				Row_State = rowrelease;
-			}
-			break;
-		default: Row_State = rowwait;
-	}
-*/	return Row_State;
-}
-
-enum Col_States{colwait,left,right,colrelease}Col_State;
-int Col_Tick(int Col_State){
-/*	switch(Col_State){
-		case colwait:
 			if(A2){
-				Col_State = left;
+				Move_State = left;
 			}
 			else if(A3){
-				Col_State = right;
+				Move_State = right;
 			}
 			else{
-				Col_State = colwait;
+				Move_State = wait;
 			}
+			break;
+		case down:
+			for(int i = 0; i < 5; ++i){
+				if((row[i] == 0xEF) && (pattern[i] != 0)){
+					edge = true;
+				}
+			}
+			if(edge == true){
+				edge = false; //reset edge bool 
+				//do nothing, keep it the same
+			}
+			else{
+				for(int i = 4; i > 0; --i){
+					pattern[i] = pattern[i-1]; 
+				}
+				pattern[0] = 0x00; 
+			}
+			Move_State = release;
+			break;
+		case up:
+			for(int i = 0; i < 5; ++i){
+				if((row[i] == 0xEF) && (pattern[i] != 0)){
+					edge = true;
+				}
+			}
+			if(edge == true){
+				edge = false; //reset
+				//do nothing
+			else{
+				for(int i = 0; i < 4; ++i){
+					pattern[i] = pattern[i+1];
+				}
+				pattern[4] = 0x00;
+			}
+			Move_State = release;
 			break;
 		case left:
-			if(pattern == 0x80){
-				//do nothing, its on the edge
+			for(int i = 0; i < 5; ++i){
+				if(pattern[i] >= 0x80){
+					edge = true;
+				}
+			}
+			if(edge == true){
+				edge = false;
 			}
 			else{
-				pattern = pattern << 1;
+				for(int i = 0; i < 5; ++i){
+					pattern[i] = pattern[i] << 1;
+				}
 			}
-			Col_State = colrelease; 
+			Move_State = release; 
 			break;
 		case right:
-			if(pattern == 0x01){
-				//do nothing, on edge
+			for(int i = 0; i < 5; ++i){
+				if(pattern[i] & 0x01){
+					edge = true;
+				}
+			}
+			if(edge == true){
+				edge = false;
 			}
 			else{
-				pattern = pattern >> 1;
+				for(int i = 0; i < 5; ++i){
+					pattern[i] = pattern[i] >> 1;	
+				}
 			}
-			Col_State = colrelease;
+			Move_State = release;
 			break;
-		case colrelease:
-			if(!A2 && !A3){
-			       Col_State = colwait;
+		case release:
+			if(!A0 && !A1 && !A2 && !A3){
+				Move_State = wait;
 			}
-	 		else{
-				Col_State = colrelease;
+			else{
+				Move_State = release;
 			}
 			break;
-		default: Col_State = colwait; break;		
+		default: Move_State = wait;
 	}
-*/	return Col_State;
+	return Move_State;
 }
 
 enum Display_States{display}Display_State;
@@ -125,8 +134,8 @@ int Display_Tick(int Display_State){
 	switch(Display_State){
 
 		case display:
-			PORTC = pattern_[update];
-			PORTD = row_[update];
+			PORTC = pattern[update];
+			PORTD = row[update];
 			++update;
 			if(update > 4){
 				update = 0;
@@ -152,22 +161,16 @@ int main(void) {
 
     const char start = -1;
 
-    //ROW
+    //MOVE
     task1.state = start;
     task1.period = 100; 
     task1.elapsedTime = task1.period;
-    task1.TickFct = &Row_Tick;
+    task1.TickFct = &Move_Tick;
 
-    //COL
     task2.state = start;
-    task2.period = 100;
+    task2.period = 1;
     task2.elapsedTime = task2.period;
-    task2.TickFct = &Col_Tick;
-
-    task3.state = start;
-    task3.period = 1;
-    task3.elapsedTime = task3.period;
-    task3.TickFct = &Display_Tick;
+    task2.TickFct = &Display_Tick;
 
     TimerSet(1);
     TimerOn();
