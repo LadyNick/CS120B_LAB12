@@ -47,7 +47,7 @@ int Row_Tick(int Row_State) {
 			}
 			Row_State = rowrelease;
 			break;
-		case rowdown:
+		case rowup:
 			if(row == 0xFE){
 				//do nothing, keep it the same
 			}
@@ -66,10 +66,11 @@ int Row_Tick(int Row_State) {
 			break;
 		default: Row_State = wait;
 	}
+	return Row_State;
 }
 
 enum Display_States{display}Display_State;
-Display_Tick(int Display_State){
+int Display_Tick(int Display_State){
 	switch(Display_State){
 		case display:
 			PORTC = pattern;
@@ -78,6 +79,7 @@ Display_Tick(int Display_State){
 			break;
 		default: Display_State = display; break;
 	}
+	return Display_State;
 }
 
 
