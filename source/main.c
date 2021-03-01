@@ -16,8 +16,8 @@
 #include "scheduler.h"
 #endif
 
-char pattern[5] = {0x00, 0x3C, 0x24, 0x3C, 0x00};
-char row[5] = { 0xFE, 0xFD, 0xFB, 0xF7, 0xEF}; 
+unsigned char pattern[5] = {0x00, 0x3C, 0x24, 0x3C, 0x00};
+unsigned char row[5] = { 0xFE, 0xFD, 0xFB, 0xF7, 0xEF}; 
 unsigned char update = 0;
 bool edge = false;
 
@@ -26,6 +26,33 @@ unsigned char A0;
 unsigned char A1;
 unsigned char A2;
 unsigned char A3;
+
+void transmit_data(unsigned char data, int reg) {
+    int i;
+    for (i = 0; i < 8 ; ++i) {
+   	 // Sets SRCLR to 1 allowing data to be set
+   	 // Also clears SRCLK in preparation of sending data
+	 if(reg == 1){
+	 	PORTC = 0x08;
+	 }
+	 else if( reg == 2){
+		PORTC = 0x10;
+	 }
+   	 // set SER = next bit of data to be sent.
+   	 PORTC |= ((data >> i) & 0x01);
+   	 // set SRCLK = 1. Rising edge shifts next bit of data into the shift register
+   	 PORTC |= 0x02;
+    }
+    // set RCLK = 1. Rising edge copies data from “Shift” register to “Storage” register
+    if(reg == 1){
+	PORTC |= 0x04;
+    }
+    else if(reg == 2){
+	PORTC |= 0x20;
+    }
+    // clears all lines in preparation of a new transmission
+    PORTC = 0x00;
+}
 
 enum Move_States {wait, up, down, left, right, release}Move_State;
 int Move_Tick(int Move_State) {
@@ -133,8 +160,8 @@ int Display_Tick(int Display_State){
 	switch(Display_State){
 
 		case display:
-			PORTC = pattern[update];
-			PORTD = row[update];
+			transmit_data(pattern[update], 1);
+			transmit_data(row[update], 2);
 			++update;
 			if(update > 4){
 				update = 0;
