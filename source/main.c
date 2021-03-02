@@ -29,7 +29,9 @@ unsigned char A3;
 
 void transmit_data(unsigned char data, unsigned char reg) {
 	unsigned char lower = ~((data & 0x0F) << 4) & 0xF0; //takes bits 3-0 --> 7-4 and flips
-	unsigned char higher = ~((data & 0xF0) >> 4) & 0X0F; //this makes the bits 7-4 --> 3-0 and flips
+	unsigned char higher = ((data & 0xF0) >> 4) & 0X0F; //this makes the bits 7-4 --> 3-0 and flips
+	// for some reason here lower which becoems higher comes out right but higher which is now lower comes out mirrored or at least opposte
+	
 	
 	data = lower + higher;
 	
