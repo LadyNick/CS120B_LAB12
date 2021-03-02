@@ -33,64 +33,6 @@ void transmit_data(unsigned char data, unsigned char reg) {
     data = (data & 0xCC) >> 2 | (data & 0x33) << 2;
     // Middle
     data = (data & 0xAA) >> 1 | (data & 0x55) << 1;
-
-	
-	/*unsigned char lower = ~((data & 0x0F) << 4) & 0xF0; //takes bits 3-0 --> 7-4 and flips
-	unsigned char higher = ~((data & 0xF0) >> 4) & 0X0F; //this makes the bits 7-4 --> 3-0 and flips
-	// for some reason here lower which becoems higher comes out right but higher which is now lower comes out mirrored or at least opposte
-	
-	unsigned char bit0, bit1, bit2, bit3;
-	if(reg == 2){
-	bit3 = (higher & 0x01);
-	bit2 = ((higher & 0x02) >> 1) & 0x01;
-	bit1 = ((higher & 0x04) >> 2) & 0x01;
-	bit0 = ((higher & 0x08) >> 3) & 0x01;
-	
-	higher = (bit3 << 1) + bit2;
-	higher = (higher << 1) + bit1;
-	higher = (higher << 1) + bit0;
-	}
-	
-	unsigned char bit7, bit6, bit5, bit4;
-	
-	bit7 = ((lower & 0x10) >> 4) & 0x01;
-	bit6 = ((lower & 0x20) >> 5) & 0x01;
-	bit5 = ((lower & 0x40) >> 6) & 0x01;
-	bit4 = ((lower & 0x80) >> 7) & 0x01;
-	
-	lower = (bit7 << 1) + bit6;
-	lower = (lower << 1) + bit5;
-	lower = (lower << 1) + bit4;
-	lower = (lower << 4) & 0xF0;
-
-	if(reg == 2){
-		higher = ~higher & 0x0F;
-	}
-
-	lower = ~lower & 0xF0;
-	data = lower + higher;*/
-	
-	//unsigned char bit1, bit2, bit3, bit4, bit5, bit6, bit0, bit7;
-	//mirroring lower which is now bits 7 to 4  so bit4 will be what bit7 was, bit5 will be what bit 6 was,
-	//6 will be 5 and 7 will be 4
-	/*bit7 = ((lower & 0x10) >> 4) & 0x01;
-	bit6 = ((lower & 0x20) >> 5) & 0x01;
-	bit5 = ((lower & 0x40) >> 6) & 0x01;
-	bit4 = ((lower & 0x80) >> 7) & 0x01;
-	
-	//bit3 should be what bit0 was, bit2 is what bit1 was, bit1 bit2, and bit0 bit3
-	bit3 = (higher & 0x01);
-	bit2 = ((higher & 0x02) >> 1) & 0x01;
-	bit1 = ((higher & 0x04) >> 2) & 0x01;
-	bit0 = ((higher & 0x08) >> 3) & 0x01;
-	
-	data = (bit7 << 1) + bit6;
-	data = (data << 1) + bit5;
-	data = (data << 1) + bit4;
-	data = (data << 1) + bit3;
-	data = (data << 1) + bit2;
-	data = (data << 1) + bit1;
-	data = (data << 1) + bit0; */
 	
     int i;
     if (reg == 1) {
