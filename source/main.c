@@ -30,12 +30,28 @@ unsigned char A3;
 void transmit_data(unsigned char data, unsigned char reg) {
 	unsigned char lower = ~((data & 0x0F) << 4); //takes bits 3-0 --> 7-4 and flips
 	unsigned char higher = ~((data & 0xF0) >> 4); //this makes the bits 7-4 --> 3-0 and flips
-	higher = higher & 0x0F; //so it becomes the lower and the higher btis it holds is 0
-	lower = lower & 0xF0; //this ensures the lower bits of this char are now 0 so we can now just or higher and lower and assign it to data once again
 	
-	data = higher | lower;
+	unsigned char bit1, bit2, bit3, bit4, bit5, bit6, bit0, bit7;
+	//mirroring lower which is now bits 7 to 4  so bit4 will be what bit7 was, bit5 will be what bit 6 was,
+	//6 will be 5 and 7 will be 4
+	bit7 = ((lower & 0x10) >> 4) & 0x01;
+	bit6 = ((lower & 0x20) >> 5) & 0x01;
+	bit5 = ((lower & 0x40) >> 6) & 0x01;
+	bit4 = ((lower & 0x80) >> 7) & 0x01;
 	
+	//bit3 should be what bit0 was, bit2 is what bit1 was, bit1 bit2, and bit0 bit3
+	bit3 = (higher & 0x01);
+	bit2 = ((higher & 0x02) >> 1) & 0x01;
+	bit1 = ((higher & 0x04) >> 2) & 0x01;
+	bit0 = ((higher & 0x08) >> 3) & 0x01;
 	
+	data = (bit7 << 1) + bit6;
+	data = (data << 1) + bit5;
+	data = (data << 1) + bit4;
+	data = (data << 1) + bit3;
+	data = (data << 1) + bit2;
+	data = (data << 1) + bit1;
+	data = (data << 1) + bit0;
 	
     int i;
     if (reg == 1) {
