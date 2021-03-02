@@ -28,7 +28,32 @@ unsigned char A2;
 unsigned char A3;
 
 void transmit_data(unsigned char data, unsigned char reg) {
-	unsigned char lower = ~((data & 0x0F) << 4) & 0xF0; //takes bits 3-0 --> 7-4 and flips
+    data = (data & 0xF0) >> 4 | (data & 0x0F) << 4;
+    // Outer-Middle
+    data = (data & 0xCC) >> 2 | (data & 0x33) << 2;
+    // Middle
+    data = (data & 0xAA) >> 1 | (data & 0x55) << 1;
+
+    unsigned char lower = (data & 0x0F); //takes bits 3-0 --> 7-4 and flips
+    unsigned char higher = ((data & 0xF0) >> 4); //this makes the bits 7-4 --> 3-0 and flips
+    
+    unsigned char bit1, bit2, bit3, bit4, bit5, bit6, bit0, bit7 = 0;
+    //mirroring lower which is now bits 7 to 4  so bit4 will be what bit7 was, bit5 will be what bit 6 was,
+    //6 will be 5 and 7 will be 4
+    bit7 = (lower & 0x01) << 7;
+    bit6 = (lower & 0x02) << 5;
+    bit5 = (lower & 0x04) << 3;
+    bit4 = (lower & 0x08) << 1;
+    
+    //bit3 should be what bit0 was, bit2 is what bit1 was, bit1 bit2, and bit0 bit3
+    bit3 = (higher & 0x01) << 3;
+    bit2 = (higher & 0x02) << 1;
+    bit1 = (higher & 0x04) >> 1;
+    bit0 = (higher & 0x08) >> 3;
+    
+    data = (bit7 | bit6 | bit5 | bit4 | bit3 | bit2 | bit1 | bit0);
+	
+	/*unsigned char lower = ~((data & 0x0F) << 4) & 0xF0; //takes bits 3-0 --> 7-4 and flips
 	unsigned char higher = ~((data & 0xF0) >> 4) & 0X0F; //this makes the bits 7-4 --> 3-0 and flips
 	// for some reason here lower which becoems higher comes out right but higher which is now lower comes out mirrored or at least opposte
 	
@@ -61,7 +86,7 @@ void transmit_data(unsigned char data, unsigned char reg) {
 	}
 
 	lower = ~lower & 0xF0;
-	data = lower + higher;
+	data = lower + higher;*/
 	
 	//unsigned char bit1, bit2, bit3, bit4, bit5, bit6, bit0, bit7;
 	//mirroring lower which is now bits 7 to 4  so bit4 will be what bit7 was, bit5 will be what bit 6 was,
