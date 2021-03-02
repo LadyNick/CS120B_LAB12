@@ -32,7 +32,8 @@ void transmit_data(unsigned char data, unsigned char reg) {
 	unsigned char higher = ~((data & 0xF0) >> 4) & 0X0F; //this makes the bits 7-4 --> 3-0 and flips
 	// for some reason here lower which becoems higher comes out right but higher which is now lower comes out mirrored or at least opposte
 	
-	/*unsigned char bit0, bit1, bit2, bit3;
+	unsigned char bit0, bit1, bit2, bit3;
+	if(reg == 2){
 	bit3 = (higher & 0x01);
 	bit2 = ((higher & 0x02) >> 1) & 0x01;
 	bit1 = ((higher & 0x04) >> 2) & 0x01;
@@ -40,7 +41,8 @@ void transmit_data(unsigned char data, unsigned char reg) {
 	
 	higher = (bit3 << 1) + bit2;
 	higher = (higher << 1) + bit1;
-	higher = (higher << 1) + bit0;*/
+	higher = (higher << 1) + bit0;
+	}
 	
 	unsigned char bit7, bit6, bit5, bit4;
 	
