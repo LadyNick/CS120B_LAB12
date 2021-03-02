@@ -28,7 +28,15 @@ unsigned char A2;
 unsigned char A3;
 
 void transmit_data(unsigned char data, unsigned char reg) {
-
+	unsigned char lower = ~((data & 0x0F) << 4); //takes bits 3-0 --> 7-4 and flips
+	unsigned char higher = ~((data & 0xF0) >> 4); //this makes the bits 7-4 --> 3-0 and flips
+	higher = higher & 0x0F; //so it becomes the lower and the higher btis it holds is 0
+	lower = lower & 0xF0; //this ensures the lower bits of this char are now 0 so we can now just or higher and lower and assign it to data once again
+	
+	data = higher | lower;
+	
+	
+	
     int i;
     if (reg == 1) {
         for (i = 0; i < 8 ; ++i) {
