@@ -173,8 +173,8 @@ int Display_Tick(int Display_State){
 	switch(Display_State){
 
 		case display:
-			transmit_data(pattern[update]);
-			transmit_data(row[update]);
+			transmit_data(pattern[update], 1);
+			transmit_data(row[update], 2);
 			++update;
 			if(update > 4){
 				update = 0;
