@@ -176,8 +176,8 @@ int Display_Tick(int Display_State){
 	switch(Display_State){
 
 		case display:
-			transmit_sreg1(pattern[update]);
-			transmit_sreg2(row[update]);
+			transmit_sreg1(0xFF/*pattern[update]*/);
+			transmit_sreg2(0xFE/*row[update]*/);
 			++update;
 			if(update > 4){
 				update = 0;
