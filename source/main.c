@@ -28,8 +28,10 @@ unsigned char A2;
 unsigned char A3;
 
 void transmit_data(unsigned char data, unsigned char reg) {
-	//unsigned char lower = data & 0x0F; //takes lower nibble
-	//unsigned char higher = data & 0xF0; //this takes the high nibble
+	unsigned char lower = ~((data & 0x0F) << 4) & 0xF0; //takes bits 3-0 --> 7-4 and flips
+	unsigned char higher = ~((data & 0xF0) >> 4) & 0X0F; //this makes the bits 7-4 --> 3-0 and flips
+	
+	data = lower + higher;
 	
 	//unsigned char bit1, bit2, bit3, bit4, bit5, bit6, bit0, bit7;
 	//mirroring lower which is now bits 7 to 4  so bit4 will be what bit7 was, bit5 will be what bit 6 was,
