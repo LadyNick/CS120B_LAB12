@@ -54,10 +54,11 @@ void transmit_data(unsigned char data, unsigned char reg) {
 	lower = (lower << 1) + bit4;
 	lower = (lower << 4) & 0xF0;
 
-	if(reg == 1){
-		lower = ~lower & 0xF0;
-	}	
-	
+	if(reg == 2){
+		higher = ~higher & 0x0F;
+	}
+
+	lower = ~lower & 0xF0;
 	data = lower + higher;
 	
 	//unsigned char bit1, bit2, bit3, bit4, bit5, bit6, bit0, bit7;
@@ -218,8 +219,8 @@ int Display_Tick(int Display_State){
 	switch(Display_State){
 
 		case display:
-			transmit_data(0xAD,1);
-			transmit_data(0xAF, 2);
+			transmit_data(0xC9,1);
+			transmit_data(0x7A, 2);
 			++update;
 			if(update > 4){
 				update = 0;
